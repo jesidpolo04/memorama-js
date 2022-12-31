@@ -1,4 +1,5 @@
 startTime()
+let playerCanPlay = true
 
 document.addEventListener('click', (e)=>{
     if(e.target.classList.contains(CARD_CLASS)){
@@ -14,6 +15,7 @@ let cardsInPlay = []
 
 /* Player actions */
 function play(card){
+    if(!playerCanPlay) return;
     if(!isFlippedCard(card)){
         if( !(flippedCards < maxFlippableCards) ){
             throw Error("Player Can't flip more than two cards per turn")
@@ -23,6 +25,7 @@ function play(card){
         cardsInPlay.push(card)
         console.info('flipped cards', cardsInPlay)
         if(flippedCards >= maxFlippableCards){
+            lockPlayerActions()
             finishTurn()
         }
     }
@@ -45,21 +48,23 @@ function isFlippedCard(card){
 
 /* Game actions */
 function finishTurn(){
-    setTimeout( ()=>{
-
-        if( cardMatch(cardsInPlay[0], cardsInPlay[1]) ){
-            outPlayCards.push(...cardsInPlay)
-            right()
-            checkGameState()
-        }else{
+    if( cardMatch(cardsInPlay[0], cardsInPlay[1]) ){
+        outPlayCards.push(...cardsInPlay)
+        right()
+        checkGameState()
+        unlockPlayerActions()
+        cardsInPlay = [];
+        flippedCards = 0;
+    }else{
+        setTimeout( ()=>{
             flipCards(cardsInPlay)
             wrong()
             checkGameState()
-        }
-        cardsInPlay = [];
-        flippedCards = 0;
-
-    }, TURN_TIMEOUT )
+            unlockPlayerActions()
+            cardsInPlay = [];
+            flippedCards = 0;
+        }, TURN_TIMEOUT )
+    }
 }
 
 function flipCards(cards){
@@ -87,4 +92,13 @@ function checkGameState(){
 
 function endGame(){
     alert(`Congratulations!\nYou finished in ${time} seconds with ${wrongs} mistakes!`)
+    lockPlayerActions()
+}
+
+function lockPlayerActions(){
+    playerCanPlay = false
+}
+
+function unlockPlayerActions(){
+    playerCanPlay = true
 }
