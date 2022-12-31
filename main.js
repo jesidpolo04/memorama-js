@@ -1,7 +1,7 @@
-/* const board = document.getElementById('game-board') */
+startTime()
 
 document.addEventListener('click', (e)=>{
-    if(e.target.classList.contains('card')){
+    if(e.target.classList.contains(CARD_CLASS)){
         play(e.target)
     }
 })
@@ -45,13 +45,21 @@ function isFlippedCard(card){
 
 /* Game actions */
 function finishTurn(){
-    if( cardMatch(cardsInPlay[0], cardsInPlay[1]) ){
-        outPlayCards.push(...cardsInPlay)
-    }else{
-        flipCards(cardsInPlay)
-    }
-    cardsInPlay = [];
-    flippedCards = 0;
+    setTimeout( ()=>{
+
+        if( cardMatch(cardsInPlay[0], cardsInPlay[1]) ){
+            outPlayCards.push(...cardsInPlay)
+            right()
+            checkGameState()
+        }else{
+            flipCards(cardsInPlay)
+            wrong()
+            checkGameState()
+        }
+        cardsInPlay = [];
+        flippedCards = 0;
+
+    }, TURN_TIMEOUT )
 }
 
 function flipCards(cards){
@@ -67,6 +75,16 @@ function flipCards(cards){
  * @returns {boolean}
  */
 function cardMatch(cardOne, cardTwo){
-    console.log(cardOne.dataset.code === cardTwo.dataset.code ? true : false)
     return cardOne.dataset.code === cardTwo.dataset.code ? true : false
+}
+
+
+function checkGameState(){
+    if(rights === cards.length / 2){
+        endGame()
+    }
+}
+
+function endGame(){
+    alert(`Congratulations!\nYou finished in ${time} seconds with ${wrongs} mistakes!`)
 }
