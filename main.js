@@ -1,4 +1,4 @@
-startTime()
+let firstMoveDone = false
 let playerCanPlay = true
 
 document.addEventListener('click', (e)=>{
@@ -6,6 +6,8 @@ document.addEventListener('click', (e)=>{
         play(e.target)
     }
 })
+
+document.querySelector('#reset').addEventListener('click', resetGame)
 
 /* Game State */
 const maxFlippableCards = 2
@@ -15,6 +17,7 @@ let cardsInPlay = []
 
 /* Player actions */
 function play(card){
+    checkFirstMove()
     if(!playerCanPlay) return;
     if(!isFlippedCard(card)){
         if( !(flippedCards < maxFlippableCards) ){
@@ -91,8 +94,9 @@ function checkGameState(){
 }
 
 function endGame(){
-    alert(`Congratulations!\nYou finished in ${time} seconds with ${wrongs} mistakes!`)
     lockPlayerActions()
+    stopTime()
+    alert(`Congratulations!\nYou finished in ${time} seconds with ${wrongs} mistakes!`)
 }
 
 function lockPlayerActions(){
@@ -101,4 +105,20 @@ function lockPlayerActions(){
 
 function unlockPlayerActions(){
     playerCanPlay = true
+}
+
+function checkFirstMove(){
+    if(!firstMoveDone){
+        firstMoveDone = true;
+        startTime()
+    } 
+}
+
+function resetGame(){
+    stopTime()
+    flipCards(outPlayCards)
+    resetRights()
+    resetWrongs()
+    resetTime()
+    firstMoveDone = false
 }
